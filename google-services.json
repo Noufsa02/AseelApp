@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "136825881752",
+    "project_id": "aseel-demo",
+    "storage_bucket": "aseel-demo.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:136825881752:android:fe157000f83b3dd760bced",
+        "android_client_info": {
+          "package_name": "com.UQU.aseelapp"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyACsDYO_wnm48QkjcQXA-5QLtCVqjR0W8k"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
