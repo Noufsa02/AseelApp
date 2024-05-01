@@ -32,7 +32,7 @@ const UsageGuideScreen = ({ navigation }) => {
       </Swiper>
       <TouchableOpacity
           onPress={() => navigation.navigate('NavigationBar')}>
-          <Text>تخطي</Text>
+          <Text style={styles.buttonText}>تخطي</Text>
         </TouchableOpacity>
     </View>
   );
@@ -72,6 +72,16 @@ const styles = StyleSheet.create({
     fontSize: 18,
     marginTop: 20,
     textAlign: 'center',
+  },
+  buttonText: {
+    //color: '#FFF',
+    fontSize: 15,
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 10,
+    right: 160,
+    bottom: 17,
+    marginBottom: 10,
   },
 });
 

@@ -1,10 +1,10 @@
+
 // SignUpScreen.js
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Image, TextInput, Button, ScrollView } from 'react-native';
-import { FIREBASE_APP,FIREBASE_AUTH, FIREBASE_DB } from './FirebaseConfig';
+import { View, Text,ActivityIndicator, StyleSheet, TouchableOpacity, Image, TextInput, Button, ScrollView } from 'react-native';
+import { FIREBASE_APP, FIREBASE_AUTH, FIREBASE_DB } from './FirebaseConfig';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
-import { addDoc, collection } from 'firebase/firestore';
-
+import { addDoc, collection, setDoc, doc } from 'firebase/firestore';
 
 const SignUpScreen = ({ navigation }) => {
   const [firstName, setFirstName] = useState('');
@@ -14,6 +14,8 @@ const SignUpScreen = ({ navigation }) => {
   const [phoneNumber, setPhoneNumber] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
 
   const [firstNameError, setFirstNameError] = useState('');
   const [lastNameError, setLastNameError] = useState('');
@@ -22,17 +24,14 @@ const SignUpScreen = ({ navigation }) => {
   const [phoneNumberError, setPhoneNumberError] = useState('');
   const [passwordError, setPasswordError] = useState('');
   const [confirmPasswordError, setConfirmPasswordError] = useState('');
-  const auth = FIREBASE_AUTH ;
 
-
+  const auth = FIREBASE_AUTH;
 
   const handleSignInPress = () => {
     navigation.navigate('SignIn');
   };
 
-
   const handleSignUpPress = async () => {
-  
     // Reset previous error messages
     setFirstNameError('');
     setLastNameError('');
@@ -65,90 +64,131 @@ const SignUpScreen = ({ navigation }) => {
       setConfirmPasswordError('الرجاء إعادة كتابة الرقم السري');
     }
 
-    const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+    // Check if passwords match
+    if (password !== confirmPassword) {
+      setConfirmPasswordError('الرجاء التأكد من تطابق كلمتي المرور');
+      return; // Exit early if passwords don't match
+    }
 
-    const doc = await addDoc(collection(FIREBASE_DB, 'users'), {
-      firstName: firstName,
-      lastName: lastName,
-      birthday: birthday,
-      email: email,
-      phoneNumber: phoneNumber,
-      password: password
-    });
+    // Early return if there are any errors
+    if (firstNameError || lastNameError || birthdayError || emailError || phoneNumberError || passwordError || confirmPasswordError) {
+      return;
+    }
 
-   navigation.navigate('UsageGuide');
+    setLoading(true); 
+
+    try {
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      const user = userCredential.user;
+    
+      await setDoc(doc(FIREBASE_DB, "users", user.uid), {
+        firstName,
+        lastName,
+        birthday,
+        phoneNumber,
+        email,
+      });
+    
+      navigation.navigate('UsageGuide');
+    } catch (error) {
+      // Check if the error is an email already in use error
+      if (error.code === 'auth/email-already-in-use') {
+        setError('This email address is already in use. Please try another.');
+      } else {
+        setError(error.message); // Set any other error messages
+      }
+    }
+    
   };
 
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <Image
-          source={require('./assets/logo.png')}
-          style={styles.logo}
-          resizeMode="contain"
-        />
+        <Image source={require('./assets/logo.png')} style={styles.logo} resizeMode="contain" />
       </View>
-      
+
       {/* Content area */}
       <ScrollView contentContainerStyle={styles.content}>
         <Text style={styles.headerText}>إنشاء حساب</Text>
-         {/* Sign-up form */}
-         <TextInput
+
+        {/* Form fields */}
+        <TextInput
           style={styles.input}
           placeholder="الإسم الأول"
+          placeholderTextColor="#ccc"
           value={firstName}
-          onChangeText={text => setFirstName(text)}
+          onChangeText={setFirstName}
         />
         {firstNameError ? <Text style={styles.errorText}>{firstNameError}</Text> : null}
+
         <TextInput
           style={styles.input}
           placeholder="الاسم الأخير"
+          placeholderTextColor="#ccc"
           value={lastName}
-          onChangeText={text => setLastName(text)}
+          onChangeText={setLastName}
         />
         {lastNameError ? <Text style={styles.errorText}>{lastNameError}</Text> : null}
+
         <TextInput
           style={styles.input}
           placeholder="تاريخ الميلاد"
+          placeholderTextColor="#ccc"
           value={birthday}
-          onChangeText={text => setBirthday(text)}
+          onChangeText={setBirthday}
         />
         {birthdayError ? <Text style={styles.errorText}>{birthdayError}</Text> : null}
+
         <TextInput
-          style={styles.input}
-          placeholder="الايميل"
-          value={email}
-          onChangeText={text => setEmail(text)}
-        />
+  style={styles.input}
+  placeholder="الايميل"
+  placeholderTextColor="#ccc"
+  value={email}
+  onChangeText={(text) => setEmail(text)}
+/>
+
         {emailError ? <Text style={styles.errorText}>{emailError}</Text> : null}
+
         <TextInput
           style={styles.input}
           placeholder="رقم الجوال"
+          placeholderTextColor="#ccc"
           value={phoneNumber}
-          onChangeText={text => setPhoneNumber(text)}
+          onChangeText={setPhoneNumber}
         />
         {phoneNumberError ? <Text style={styles.errorText}>{phoneNumberError}</Text> : null}
+
         <TextInput
-          style={styles.input}
-          placeholder="الرقم السري"
-          value={password}
-          onChangeText={text => setPassword(text)}
-          secureTextEntry
-        />
+  style={styles.input}
+  placeholder="الرقم السري"
+  placeholderTextColor="#ccc"
+  value={password}
+  onChangeText={(text) => setPassword(text)}
+  secureTextEntry
+/>
+
         {passwordError ? <Text style={styles.errorText}>{passwordError}</Text> : null}
+
         <TextInput
-          style={styles.input}
-          placeholder="تأكيد الرقم السري"
-          value={confirmPassword}
-          onChangeText={text => setConfirmPassword(text)}
-          secureTextEntry
-        />
+  style={styles.input}
+  placeholder="تأكيد الرقم السري"
+  placeholderTextColor="#ccc"
+  value={confirmPassword}
+  onChangeText={(text) => setConfirmPassword(text)}
+  secureTextEntry
+/>
         {confirmPasswordError ? <Text style={styles.errorText}>{confirmPasswordError}</Text> : null}
-        <Button
-          title="إنشاء حساب"
-          onPress={handleSignUpPress}
-          style={styles.button}
-        />
+
+        {/* Submit button */}
+        {error ? <Text style={styles.errorText}>{error}</Text> : null}
+        <TouchableOpacity style={styles.button} onPress={handleSignUpPress}>
+          {loading ? (
+            <ActivityIndicator size="small" color="#FAF6D0" />
+          ) : (
+            <Text style={styles.buttonText}>إنشاء حساب</Text>
+          )}
+        </TouchableOpacity>
+
         <TouchableOpacity onPress={handleSignInPress}>
           <Text style={styles.signInText}>هل لديك حساب بالفعل؟ قم بتسجيل الدخول</Text>
         </TouchableOpacity>
@@ -165,7 +205,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: '#FAF6D0',
-
   },
   logo: {
     width: 300,
@@ -192,7 +231,6 @@ const styles = StyleSheet.create({
     padding: 10,
     marginBottom: 10,
     borderRadius: 5,
-    left: 2,
   },
   signInText: {
     color: 'dodgerblue',
@@ -206,7 +244,11 @@ const styles = StyleSheet.create({
     backgroundColor: '#649BA2',
     paddingVertical: 10,
     paddingHorizontal: 20,
-    borderRadius: 20,
+    borderRadius: 10,
+    marginBottom: 10,
+  },
+  buttonText: {
+    color: '#FFF',
   },
 });
 
