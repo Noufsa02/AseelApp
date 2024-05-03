@@ -1,48 +1,71 @@
+import { FontAwesome } from '@expo/vector-icons';
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TextInput, TouchableOpacity, Alert } from 'react-native';
+import { View, Text, StyleSheet, TextInput, TouchableOpacity, Alert, ScrollView, ActivityIndicator } from 'react-native';
+import { sendPasswordResetEmail } from 'firebase/auth';
+import { FIREBASE_AUTH } from './FirebaseConfig';
 
 const ForgotPasswordScreen = ({ navigation }) => {
   const [email, setEmail] = useState('');
+  const [loading, setLoading] = useState(false);
 
-  const handleResetPassword = () => {
-    // Perform your password reset logic here
-    if (!email) {
-      Alert.alert('Error', 'الرجاء إدخال البريد الإلكتروني لإعادة تعيين كلمة المرور');
-    } else {
-      // Send a reset password email to the provided email address
-      // Example: Call your API endpoint to initiate the password reset process
-      // After successful submission, navigate to a confirmation page or display a success message
-      Alert.alert('Success', 'تم إرسال رسالة إعادة تعيين كلمة المرور إلى البريد الإلكتروني المقدم');
-      // Navigate to the confirmation page
-      // navigation.navigate('ResetPasswordConfirmation');
+  const handleResetPassword = async () => {
+    if (email.trim() === '') {
+      alert('Please enter your email address.');
+      return;
+    }
+  
+    try {
+      setLoading(true);
+      await sendPasswordResetEmail(FIREBASE_AUTH, email);
+      setLoading(false);
+      alert('Password reset email sent! Check your inbox.');
+    } catch (error) {
+      setLoading(false);
+      console.error('Password reset failed:', error);
+      let errorMessage = 'Failed to send password reset email. Please try again.';
+      if (error.code === 'auth/user-not-found') {
+        errorMessage = 'No user found with this email address.';
+      } else if (error.code === 'auth/network-request-failed') {
+        errorMessage = 'Network error. Please check your internet connection.';
+      }
+      alert(errorMessage);
     }
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.headerText}>نسيت كلمة المرور</Text>
+    <ScrollView contentContainerStyle={styles.container}>
+    <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
+        <FontAwesome name="arrow-left" size={24} color="black" />
+      </TouchableOpacity>
+      <Text style={styles.headerText}>Forgot Password</Text>
       <TextInput
-        style={styles.input}
-        placeholder="البريد الإلكتروني"
+        style={[styles.input, { borderColor: email ? '#8F181C' : '#CCCCCC' }]}
+        placeholder="Email Address"
         value={email}
         onChangeText={setEmail}
         keyboardType="email-address"
         autoCapitalize="none"
       />
-      <TouchableOpacity style={styles.button} onPress={handleResetPassword}>
-        <Text style={styles.buttonText}>إعادة تعيين كلمة المرور</Text>
+      <TouchableOpacity style={styles.button} onPress={handleResetPassword} disabled={loading}>
+        {loading ? (
+          <ActivityIndicator color="#FFFFFF" />
+        ) : (
+          <Text style={styles.buttonText}>Reset Password</Text>
+        )}
       </TouchableOpacity>
-    </View>
+      {/* Back Button */}
+     
+    </ScrollView>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
+    flexGrow: 1,
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: '#FFFFFF',
-    paddingHorizontal: 20,
+    padding: 20,
   },
   headerText: {
     fontSize: 24,
@@ -69,6 +92,16 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
     fontSize: 16,
     fontWeight: 'bold',
+  },
+  backButton: {
+    position: 'absolute',
+    top: 315.5,
+    left: 59,
+    zIndex: 1, // Ensure the button is above other elements
+  },
+  backButtonText: {
+    color: '#000000',
+    fontSize: 16,
   },
 });
 

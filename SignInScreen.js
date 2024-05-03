@@ -1,9 +1,7 @@
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Image, TextInput, ScrollView, ActivityIndicator } from 'react-native';
+import  React, { useState } from 'react';
+import {View,Text,StyleSheet,TouchableOpacity,Image,TextInput,ScrollView,ActivityIndicator,} from 'react-native';
 import { FIREBASE_AUTH } from './FirebaseConfig';
 import { signInWithEmailAndPassword } from 'firebase/auth';
-
-
 
 const SignInScreen = ({ navigation }) => {
   const [email, setEmail] = useState('');
@@ -11,8 +9,6 @@ const SignInScreen = ({ navigation }) => {
   const [emailError, setEmailError] = useState('');
   const [passwordError, setPasswordError] = useState('');
   const [loading, setLoading] = useState(false);
-  const auth = FIREBASE_AUTH ;
-
 
   const handleSignUpPress = () => {
     navigation.navigate('SignUp');
@@ -22,33 +18,26 @@ const SignInScreen = ({ navigation }) => {
     navigation.navigate('ForgotPassword');
   };
 
-
   const handleSignInPress = async () => {
     setLoading(true);
-    // Reset previous error messages
     setEmailError('');
     setPasswordError('');
 
-    // Validate fields
-    if (!email) {
-      setEmailError('الرجاء كتابة البريد الإلكتروني');
-      return;
-    }
-    if (!password) {
-      setPasswordError('الرجاء كتابة كلمة المرور');
+    if (!email || !password) {
+      setEmailError(!email ? 'الرجاء كتابة البريد الإلكتروني' : '');
+      setPasswordError(!password ? 'الرجاء كتابة كلمة المرور' : '');
+      setLoading(false);
       return;
     }
 
     try {
-      const respose = await signInWithEmailAndPassword(auth, email, password);
+      await signInWithEmailAndPassword(FIREBASE_AUTH, email, password);
       navigation.navigate('NavigationBar');
     } catch (error) {
       console.error('Sign in failed:', error);
       alert('Sign in failed: ' + error.message);
-    } finally {
       setLoading(false);
     }
-    
   };
 
   return (
@@ -61,55 +50,45 @@ const SignInScreen = ({ navigation }) => {
         />
       </View>
       
-      {/* Content area */}
       <ScrollView contentContainerStyle={styles.content}>
-        {/* Header text moved to top */}
         <Text style={styles.headerText}>تسجيل الدخول</Text>
-         {/* Sign-in form */}
+        
+        <TextInput
+          style={styles.input}
+          placeholder="البريد الإلكتروني"
+          autoCapitalize="none"
+          value={email}
+          onChangeText={setEmail}
+          placeholderTextColor="#6a676e"
+        />
+        {emailError ? <Text style={styles.errorText}>{emailError}</Text> : null}
 
-         <TouchableOpacity onPress={handleSignInPress}>
-              <Text style={styles.button}>تسجيل الدخول </Text>
-            </TouchableOpacity>
+        <TextInput
+          style={styles.input}
+          placeholder="كلمة المرور"
+          autoCapitalize="none"
+          value={password}
+          onChangeText={setPassword}
+          secureTextEntry={true}
+          placeholderTextColor="#6a676e"
+        />
+        {passwordError ? <Text style={styles.errorText}>{passwordError}</Text> : null}
 
-            {emailError ? <Text style={styles.errorText}>{emailError}</Text> : null}
-            <TextInput
-                style={styles.input}
-                placeholder="البريد الإلكتروني"
-                autoCapitalize='none'
-                value={email}
-                onChangeText={text => setEmail(text)}
-            />
+        <TouchableOpacity onPress={handleSignInPress} style={styles.button}>
+          {loading ? (
+            <ActivityIndicator size="large" color="#FAF6D0" />
+          ) : (
+            <Text style={styles.buttonText}>تسجيل الدخول</Text>
+          )}
+        </TouchableOpacity>
 
-            {passwordError ? <Text style={styles.errorText}>{passwordError}</Text> : null}
-            <TextInput
-                style={styles.input}
-                placeholder="كلمة المرور"
-                autoCapitalize='none'
-                value={password}
-                onChangeText={text => setPassword(text)}
-                secureTextEntry={true}
-            />   
-                 {/* { loading ? ActivityIndicator size='large'} */}
-           {/* <TouchableOpacity
-              title="تسجيل الدخول"
-              onPress={handleSignInPress}
-              style={styles.button}
-            ><Text style={styles.buttonText}>تسجيل الدخول</Text>
-            </TouchableOpacity>
-  */}
+        <TouchableOpacity onPress={handleForgotPasswordPress} style={styles.linkButton}>
+          <Text style={styles.signUpText}>هل نسيت كلمة المرور؟</Text>
+        </TouchableOpacity>
 
-<TouchableOpacity onPress={handleSignInPress}>
-              <Text style={styles.button}>تسجيل الدخول </Text>
-            </TouchableOpacity>
-
-
-            <TouchableOpacity onPress={handleForgotPasswordPress}>
-              <Text style={styles.signUpText}>هل نسيت كلمة المرور؟</Text>
-            </TouchableOpacity>
-            <TouchableOpacity onPress={handleSignUpPress}>
-              <Text style={styles.signUpText}>ليس لديك حساب؟ قم بالتسجيل الآن</Text>
-            </TouchableOpacity>
-            <View style={styles.bottomSpace}></View>
+        <TouchableOpacity onPress={handleSignUpPress} style={styles.linkButton}>
+          <Text style={styles.signUpText}>ليس لديك حساب؟ قم بالتسجيل الآن</Text>
+        </TouchableOpacity>
 
       </ScrollView>
     </View>
@@ -119,66 +98,77 @@ const SignInScreen = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: '#FAF6D0',
   },
   header: {
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#FAF6D0',
   },
   logo: {
-    width: 300,
-    height: 300,
+    width: 300, // Adjust the size as required
+    height: 300, // Adjust the size as required
+    marginTop: 20,
   },
   headerText: {
     fontSize: 24,
     fontWeight: 'bold',
     color: '#649BA2',
-    marginTop: 20, // Adjust the margin to move the header text to the top
+    marginBottom: 30,
   },
   content: {
     flexGrow: 1,
     backgroundColor: '#8F181C',
-    justifyContent: 'center',
-    alignItems: 'center',
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
-    padding: 20,
+    alignItems: 'center',
+    paddingTop: 20,
+    paddingHorizontal: 20,
   },
   input: {
     backgroundColor: '#FFF',
-    width: '100%',
-    paddingVertical: 10, // Add vertical padding
-    paddingHorizontal: 15, // Add horizontal padding
-    marginBottom: 20,
-    borderRadius: 5,
-    left: 2,
+    width: '90%',
+    padding: 15,
+    borderRadius: 12,
+    fontSize: 16,
+    borderColor: '#ddd',
+    borderWidth: 1,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.2,
+    shadowRadius: 2,
+    elevation: 2,
+    marginBottom: 10,
+    textAlign: 'right', // This aligns the text to the right
   },
-  signUpText: {
-    color: 'dodgerblue',
-    marginTop: 40,
-  },
+  
   errorText: {
     color: 'red',
+    textAlign: 'center',
     marginBottom: 10,
-    textAlign: 'center', // Center the error message horizontally
-  },
-  bottomSpace: {
-    marginBottom: 40, // Add space at the bottom
   },
   button: {
-    backgroundColor: '#649BA2', //fafcfc 649BA2
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    borderRadius: 20,
-    marginVertical: 35,
-    top:210,
+    backgroundColor: '#649BA2',
+    paddingVertical: 8, // Reduced padding to make the button thinner
+    paddingHorizontal: 20, // You can adjust horizontal padding if you want to change the width as well
+    borderRadius: 40,
+    width: '60%', // Keep the width as is if you don't want to change it
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginVertical: 10, // Adjust the space around the button if needed
   },
+  
   buttonText: {
-    fontSize: 18,
+    fontSize: 20,
     fontWeight: 'bold',
     color: '#FAF6D0',
+  },
+  linkButton: {
+    marginVertical: 15,
+  },
+  signUpText: {
+    color: '#FAF6D0',
+    textDecorationLine: 'underline',
   },
 });
 
 export default SignInScreen;
-
