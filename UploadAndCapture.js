@@ -1,28 +1,72 @@
-//Ghadee, [4/23/2024 8:10 PM]
 import React, { useState, useEffect, useRef } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Image, Alert } from 'react-native';
-import { FontAwesome5, MaterialCommunityIcons } from '@expo/vector-icons';
+import { FontAwesome5 } from '@expo/vector-icons';
 import { Camera } from 'expo-camera';
 import * as ImagePicker from 'expo-image-picker';
+import * as tf from '@tensorflow/tfjs';
+import '@tensorflow/tfjs-react-native';
 
 const UploadAndCapture = ({ navigation }) => {
   const [hasPermission, setHasPermission] = useState(null);
+  const [model, setModel] = useState(null);
+  const [labels, setLabels] = useState([]);
   const cameraRef = useRef(null);
-  const isActive = true;
 
   useEffect(() => {
     (async () => {
+      // Request permissions
       const cameraStatus = await Camera.requestCameraPermissionsAsync();
       const imagePickerStatus = await ImagePicker.requestMediaLibraryPermissionsAsync();
       setHasPermission(cameraStatus.status === 'granted' && imagePickerStatus.status === 'granted');
+
+      // Initialize TensorFlow.js
+      await tf.ready();
+
+      // Load the model
+      const modelUrl = 'https://teachablemachine.withgoogle.com/models/Dxh-9KRRF/model.json';
+      const loadedModel = await tf.loadLayersModel(modelUrl);
+      setModel(loadedModel);
+      console.log('Model loaded.');
+
+      // Load class labels
+      const metadataUrl = 'https://teachablemachine.withgoogle.com/models/Dxh-9KRRF/metadata.json'; // Adjust as needed
+      const metadataResponse = await fetch(metadataUrl);
+      const metadata = await metadataResponse.json();
+      setLabels(metadata.labels);
     })();
   }, []);
+
+  const classifyImage = async (imageUri) => {
+    const response = await fetch(imageUri);
+    const blob = await response.blob();
+    const img = await tf.browser.fromPixelsAsync(blob);
+    const resized = tf.image.resizeBilinear(img, [224, 224]).toFloat();
+    const offset = tf.scalar(127.5);
+    const normalized = resized.sub(offset).div(offset);
+    const batched = normalized.expandDims(0);
+
+    const prediction = await model.predict(batched);
+    const predictedIndex = prediction.argMax(1).dataSync()[0];
+
+    if (predictedIndex !== undefined && predictedIndex < labels.length) {
+      Alert.alert('Recognition Complete', `Picture recognized as: ${labels[predictedIndex]}`);
+    } else {
+      Alert.alert('Recognition Failed', 'The picture has not been recognized.');
+    }
+  };
+
+  const handleImage = async (imageUri) => {
+    if (!model || labels.length === 0) {
+      Alert.alert('Model not loaded', 'Please wait for the model and labels to load before selecting an image.');
+      return;
+    }
+    classifyImage(imageUri);
+  };
 
   const takePicture = async () => {
     if (cameraRef.current) {
       const photo = await cameraRef.current.takePictureAsync();
-      console.log('Photo taken: ', photo);
-      Alert.alert('Photo Taken!', 'Check your console for the image data.');
+      handleImage(photo.uri);
     }
   };
 
@@ -35,8 +79,7 @@ const UploadAndCapture = ({ navigation }) => {
     });
 
     if (!result.cancelled) {
-      console.log('Image picked: ', result);
-      Alert.alert('Image Selected!', 'Check your console for the image data.');
+      handleImage(result.uri);
     }
   };
 
@@ -47,41 +90,15 @@ const UploadAndCapture = ({ navigation }) => {
   return (
     <View style={styles.container}>
       <View style={styles.navBar}>
-        <Image
-          source={require('./assets/logo.png')}
-          style={styles.logo}
-        />
+        <Image source={require('./assets/logo.png')} style={styles.logo} />
       </View>
-
-      <Image
-        source={require('./assets/guide_image1.jpg')} // Make sure you have this image in your assets
-        style={styles.guidanceImage}
-      />
-
+      <Image source={require('./assets/guide_image1.jpg')} style={styles.guidanceImage} />
       <View style={styles.cameraControls}>
-        <TouchableOpacity onPress={() => takePicture()} style={styles.cameraIcon}>
+        <TouchableOpacity onPress={takePicture} style={styles.cameraIcon}>
           <FontAwesome5 name="camera-retro" size={35} color="black" />
         </TouchableOpacity>
         <TouchableOpacity onPress={pickImage} style={styles.cameraIcon}>
           <FontAwesome5 name="image" size={35} color="black" />
-        </TouchableOpacity>
-      </View>
-
-      <View style={styles.navigationBar}>
-        <TouchableOpacity onPress={() => navigation.navigate('ProfileScreen')}>
-          <FontAwesome5 name="user" size={24} color="#F9E4D4" />
-        </TouchableOpacity>
-        <TouchableOpacity>
-          <FontAwesome5 name="map" size={24} color="#F9E4D4" />
-        </TouchableOpacity>
-        <TouchableOpacity onPress={() => navigation.navigate('UploadAndCapture')}>
-          <FontAwesome5 name="camera" size={isActive ? 26 : 24} color={isActive ? "#ffffff" : "#F9E4D4"} />
-        </TouchableOpacity>
-        <TouchableOpacity onPress={() => navigation.navigate('Community')}>
-          <FontAwesome5 name="comments" size={24} color="#F9E4D4" />
-        </TouchableOpacity>
-        <TouchableOpacity>
-          <FontAwesome5 name="home" size={24} color="#F9E4D4" />
         </TouchableOpacity>
       </View>
     </View>
