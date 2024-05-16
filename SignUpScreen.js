@@ -26,7 +26,10 @@ const SignUpScreen = ({ navigation }) => {
   const [confirmPasswordError, setConfirmPasswordError] = useState('');
 
   const auth = FIREBASE_AUTH;
-
+  const validatePassword = (password) => {
+    const regex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+    return regex.test(password);
+  };
   const handleSignInPress = () => {
     navigation.navigate('SignIn');
   };
@@ -59,6 +62,8 @@ const SignUpScreen = ({ navigation }) => {
     }
     if (!password) {
       setPasswordError('الرجاء تعيين كلمة سر');
+    } else if (!validatePassword(password)) {
+      setPasswordError('كلمة السر يجب أن تحتوي على 8 أحرف وتشمل حروف كبيرة وصغيرة ورمز واحد على الأقل');
     }
     if (!confirmPassword) {
       setConfirmPasswordError('الرجاء إعادة كتابة الرقم السري');

@@ -7,15 +7,14 @@ const Stack = createStackNavigator();
 const HomePage = ({ navigation }) => {
   const [backgroundIndex, setBackgroundIndex] = useState(0);
   const backgrounds = [
-    { image: require('./assets/background1.jpg'), text: 'Text for background 1' },
-    { image: require('./assets/background2.jpg'), text: 'Text for background 2' },
-    { image: require('./assets/background3.jpg'), text: 'Text for background 3' },
-    { image: require('./assets/background4.jpg'), text: 'Text for background 4' },
-    { image: require('./assets/background5.jpg'), text: 'Text for background 5' },
-    { image: require('./assets/background6.jpg'), text: 'Text for background 6' },
-    { image: require('./assets/background7.jpg'), text: 'Text for background 7' },
-    { image: require('./assets/background8.jpg'), text: 'Text for background 8' },
-    { image: require('./assets/background9.jpg'), text: 'Text for background 9' },
+    { image: require('./assets/background1.jpg'), text: ' أَصِيل، حيث تَتَوَهَّج رَوائعُ الماضي بين يَدَيِ الحَاضر'},
+    { image: require('./assets/background2.jpg'), text: 'أمجاد تُسطّر لتراثٍ عريق وكنزٍ وطني.. نعتز بها دومًا' },
+    { image: require('./assets/background3.jpg'), text: 'فخرٌ نتوارثه، وأصالة نعتزّ بها' },
+    { image: require('./assets/background4.jpg'), text: 'ذاكرة فخر وميلاد اعتزاز' },
+    { image: require('./assets/background5.jpg'), text: 'تراثنا وأصالتنا ثروة تتوارثها الأجيال' },
+    { image: require('./assets/background6.jpg'), text: 'التراث.. قيمةٌ حضاريةٌ للأمم، وثروةٌ عظيمةٌ للشعوب.' },
+    { image: require('./assets/background7.jpg'), text: '..قيمٌ نتوارثها.. لحاضِرنا ومُستقبلنا' },
+    { image: require('./assets/background8.jpg'), text: 'تُراثنا هو أصالة ماضينا' },
     // Add more background images and texts as needed
   ];
 
@@ -30,7 +29,9 @@ const HomePage = ({ navigation }) => {
   return (
     <View style={styles.container}>
       <ImageBackground source={backgrounds[backgroundIndex].image} style={styles.backgroundImage}>
-        <Text style={styles.backgroundText}>{backgrounds[backgroundIndex].text}</Text>
+      <View style={styles.textHighlight}>
+          <Text style={styles.backgroundText}>{backgrounds[backgroundIndex].text}</Text>
+        </View>
       </ImageBackground>
     </View>
   );
@@ -47,9 +48,15 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   backgroundText: {
-    color: 'white',
+    color: 'black',
     fontSize: 20,
     fontWeight: 'bold',
+  },
+
+  textHighlight: {
+    backgroundColor: 'rgba(250, 246, 208, 0.5)',  // Semi-transparent white
+    padding: 5,  // Adjust padding to control the size of the highlight
+    borderRadius: 50,  // Optional: add rounded corners
   },
 
 });

@@ -38,7 +38,7 @@ const ProfileScreen = ({ navigation }) => {
       const unsubscribe = onSnapshot(userRef, (doc) => {
         if (doc.exists()) {
           console.log("Document data:", doc.data());
-          const userData = doc.data();
+          const userData = doc.data(); 
           setUsername(cleanName(userData.firstName));
         } else {
           console.log('No user data available');
