@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { View, Text, ActivityIndicator, StyleSheet, TouchableOpacity, Image, TextInput, ScrollView } from 'react-native';
-import DateTimePicker from 'react-native-modal-datetime-picker';
+//import DateTimePicker from 'react-native-modal-datetime-picker';
 import RadioGroup from 'react-native-radio-buttons-group';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { FIREBASE_APP, FIREBASE_AUTH, FIREBASE_DB } from './FirebaseConfig';
@@ -191,9 +191,8 @@ const SignUpScreen = ({ navigation }) => {
 
         <View style={styles.dateInputContainer}>
           {/* <Text style={styles.dateText}>تاريخ الميلاد</Text> */}
-          <TouchableOpacity onPress={showDatePicker} style={styles.datePickerButton}>
-            {/* <Icon name="calendar" size={20} color="#999" style={styles.dateIcon} /> */}
-            <Icon name="calendar" size={20} color="#999" style={styles.dateIcon} />
+?            {/* <Icon name="calendar" size={20} color="#999" style={styles.dateIcon} /> */}
+            {/* <Icon name="calendar" size={20} color="#999" style={styles.dateIcon} />
             <TextInput
               style={styles.dateInput}
               placeholder="تاريخ الميلاد"
@@ -201,7 +200,7 @@ const SignUpScreen = ({ navigation }) => {
               value={birthday}
               editable={false}
             />
-          </TouchableOpacity>
+          </TouchableOpacity> */}
         </View>
         {birthdayError ? <Text style={styles.errorText}>{birthdayError}</Text> : null}
 
