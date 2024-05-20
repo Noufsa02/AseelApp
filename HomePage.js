@@ -1,10 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { View, ImageBackground, Text, TouchableOpacity, StyleSheet } from 'react-native';
-import { createStackNavigator } from '@react-navigation/stack';
+import { View, ImageBackground, Text, StyleSheet } from 'react-native';
 
-const Stack = createStackNavigator();
-
-const HomePage = ({ navigation }) => {
+const HomePage = () => {
   const [backgroundIndex, setBackgroundIndex] = useState(0);
   const backgrounds = [
     { image: require('./assets/background1.jpg'), text: ' أَصِيل، حيث تَتَوَهَّج رَوائعُ الماضي بين يَدَيِ الحَاضر'},
@@ -29,7 +26,8 @@ const HomePage = ({ navigation }) => {
   return (
     <View style={styles.container}>
       <ImageBackground source={backgrounds[backgroundIndex].image} style={styles.backgroundImage}>
-      <View style={styles.textHighlight}>
+        <View style={styles.overlay} />
+        <View style={styles.textContainer}>
           <Text style={styles.backgroundText}>{backgrounds[backgroundIndex].text}</Text>
         </View>
       </ImageBackground>
@@ -47,19 +45,28 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
+  overlay: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: 'rgba(0, 0, 0, 0.4)', // Dark overlay
+  },
+  textContainer: {
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+    backgroundColor: 'rgba(250, 246, 208, 0.7)', // Semi-transparent background
+    borderRadius: 10,
+    alignItems: 'center',
+  },
   backgroundText: {
-    color: 'black',
-    fontSize: 20,
+    color: '#5D1B20', // 
+    fontSize: 22,
     fontWeight: 'bold',
+    textAlign: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.8,
+    shadowRadius: 2,
+    elevation: 5, // For Android shadow
   },
-
-  textHighlight: {
-    backgroundColor: 'rgba(250, 246, 208, 0.5)',  // Semi-transparent white
-    padding: 5,  // Adjust padding to control the size of the highlight
-    borderRadius: 50,  // Optional: add rounded corners
-  },
-
 });
-
 
 export default HomePage;

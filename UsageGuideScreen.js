@@ -31,9 +31,11 @@ const UsageGuideScreen = ({ navigation }) => {
         </View>
       </Swiper>
       <TouchableOpacity
-          onPress={() => navigation.navigate('NavigationBar')}>
-          <Text style={styles.buttonText}>تخطي</Text>
-        </TouchableOpacity>
+  onPress={() => navigation.navigate('NavigationBar')}
+  style={styles.skipButton}
+>
+  <Text style={styles.skipText}>تخطي</Text>
+</TouchableOpacity>
     </View>
   );
 };
@@ -41,9 +43,10 @@ const UsageGuideScreen = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: '#EDE0C8',
   },
   header: {
-    backgroundColor: '#FAF6D0',
+    backgroundColor: '#EDE0C8',
     alignItems: 'center',
     justifyContent: 'center',
     padding: 20,
@@ -52,12 +55,14 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: 'bold',
     color: '#649BA2',
+    marginTop:20,
   },
   wrapper: {},
   slide: {
     flex: 1,
     justifyContent: 'center',
-    alignItems: 'center',
+    alignItems: 'center', // #5D1B20
+    
   },
   image: {
     width: 300,
@@ -73,16 +78,17 @@ const styles = StyleSheet.create({
     marginTop: 20,
     textAlign: 'center',
   },
-  buttonText: {
-    //color: '#FFF',
-    fontSize: 15,
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    borderRadius: 10,
-    right: 160,
-    bottom: 17,
-    marginBottom: 10,
+  skipButton: {
+    position: 'absolute',
+    top: 40,              
+    left: 10,             
+    padding: 8,          
+    backgroundColor: 'transparent' 
   },
+  skipText: {
+    color: 'gray',       
+    fontSize: 16          
+  }
 });
 
-export default UsageGuideScreen;
+export default UsageGuideScreen

@@ -3,12 +3,12 @@ import { View, Text, TouchableOpacity, StyleSheet, Image, Alert } from 'react-na
 import { FontAwesome5 } from '@expo/vector-icons';
 import { Camera } from 'expo-camera';
 import * as ImagePicker from 'expo-image-picker';
-import * as tf from '@tensorflow/tfjs';
-import '@tensorflow/tfjs-react-native';
+//import * as tf from '@tensorflow/tfjs';
+//import '@tensorflow/tfjs-react-native';
 
 const UploadAndCapture = ({ navigation }) => {
   const [hasPermission, setHasPermission] = useState(null);
-  const [model, setModel] = useState(null);
+ // const [model, setModel] = useState(null);
   const [labels, setLabels] = useState([]);
   const cameraRef = useRef(null);
 
@@ -20,23 +20,23 @@ const UploadAndCapture = ({ navigation }) => {
       setHasPermission(cameraStatus.status === 'granted' && imagePickerStatus.status === 'granted');
 
       // Initialize TensorFlow.js
-      await tf.ready();
+     // await tf.ready();
 
       // Load the model
-      const modelUrl = 'https://teachablemachine.withgoogle.com/models/Dxh-9KRRF/model.json';
-      const loadedModel = await tf.loadLayersModel(modelUrl);
-      setModel(loadedModel);
-      console.log('Model loaded.');
+     /// const modelUrl = 'https://teachablemachine.withgoogle.com/models/Dxh-9KRRF/model.json';
+     // const loadedModel = await tf.loadLayersModel(modelUrl);
+     // setModel(loadedModel);
+     // console.log('Model loaded.');
 
       // Load class labels
-      const metadataUrl = 'https://teachablemachine.withgoogle.com/models/Dxh-9KRRF/metadata.json'; // Adjust as needed
-      const metadataResponse = await fetch(metadataUrl);
-      const metadata = await metadataResponse.json();
-      setLabels(metadata.labels);
+     // const metadataUrl = 'https://teachablemachine.withgoogle.com/models/Dxh-9KRRF/metadata.json'; // Adjust as needed
+     // const metadataResponse = await fetch(metadataUrl);
+    //  const metadata = await metadataResponse.json();
+     // setLabels(metadata.labels);
     })();
   }, []);
 
-  const classifyImage = async (imageUri) => {
+ {/* const classifyImage = async (imageUri) => {
     const response = await fetch(imageUri);
     const blob = await response.blob();
     const img = await tf.browser.fromPixelsAsync(blob);
@@ -62,6 +62,7 @@ const UploadAndCapture = ({ navigation }) => {
     }
     classifyImage(imageUri);
   };
+*/}
 
   const takePicture = async () => {
     if (cameraRef.current) {

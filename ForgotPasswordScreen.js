@@ -1,4 +1,4 @@
-import { FontAwesome } from '@expo/vector-icons';
+import { FontAwesome5 } from '@expo/vector-icons';
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, TextInput, TouchableOpacity, Alert, ScrollView, ActivityIndicator } from 'react-native';
 import { sendPasswordResetEmail } from 'firebase/auth';
@@ -34,13 +34,15 @@ const ForgotPasswordScreen = ({ navigation }) => {
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
-    <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
-        <FontAwesome name="arrow-left" size={24} color="black" />
+    <TouchableOpacity 
+        style={styles.backButton} 
+        onPress={() => navigation.goBack()}>
+        <FontAwesome5 name="arrow-left" size={24} color="#000" />
       </TouchableOpacity>
-      <Text style={styles.headerText}>Forgot Password</Text>
+      <Text style={styles.headerText}>إعادة تعيين كلمة المرور</Text>
       <TextInput
         style={[styles.input, { borderColor: email ? '#8F181C' : '#CCCCCC' }]}
-        placeholder="Email Address"
+        placeholder="عنوان البريد الإلكتروني"
         value={email}
         onChangeText={setEmail}
         keyboardType="email-address"
@@ -50,7 +52,7 @@ const ForgotPasswordScreen = ({ navigation }) => {
         {loading ? (
           <ActivityIndicator color="#FFFFFF" />
         ) : (
-          <Text style={styles.buttonText}>Reset Password</Text>
+          <Text style={styles.buttonText}>تأكيد</Text>
         )}
       </TouchableOpacity>
       {/* Back Button */}
@@ -64,7 +66,7 @@ const styles = StyleSheet.create({
     flexGrow: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#EDE0C8',
     padding: 20,
   },
   headerText: {
@@ -74,6 +76,7 @@ const styles = StyleSheet.create({
   },
   input: {
     width: '100%',
+    backgroundColor:'#F6F6F6',
     borderWidth: 1,
     borderColor: '#CCCCCC',
     borderRadius: 5,
@@ -82,10 +85,10 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   button: {
-    width: '100%',
-    backgroundColor: '#8F181C',
+    width: '50%',
+    backgroundColor: '#5D1B20',
     paddingVertical: 12,
-    borderRadius: 5,
+    borderRadius: 40,
     alignItems: 'center',
   },
   buttonText: {
@@ -94,10 +97,10 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   backButton: {
-    position: 'absolute',
-    top: 315.5,
-    left: 59,
-    zIndex: 1, // Ensure the button is above other elements
+    position: 'absolute', 
+    top: 55, 
+    left: 20, 
+    zIndex: 10,
   },
   backButtonText: {
     color: '#000000',

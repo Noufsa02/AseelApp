@@ -1,0 +1,14 @@
+if (region === 'الرياض') return 'Map_Riyadh';
+    else if (region === 'مكة المكرمة') return 'Map_Makkah';
+    else if (region === 'الشمالية') return 'Map_Northern Borders ';
+    else if (region === 'الجوف') return 'Map_Al-Jawf';
+    else if (region === 'نجران') return 'Map_Najran';
+    else if (region === 'جازان') return 'Map_Jizan';
+    else if (region === 'المدينة المنورة') return 'Map_Madinah';
+    else if (region === 'حائل') return 'Map_Hail';
+    else if (region === 'القصيم') return 'Map_Al-Qassim';
+    else if (region === 'تبوك') return 'Map_Tabuk';
+    else if (region === 'الشرقية') return 'Map_Eastern Region';
+    else if (region === 'عسير') return 'Map_Asir';
+    else if (region === 'الباحة') return 'Map_Al-Bahah';
+    else return null;

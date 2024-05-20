@@ -1,24 +1,21 @@
 import { FIREBASE_AUTH, FIREBASE_DB } from './FirebaseConfig';
-import 'firebase/firestore';
 import { doc, onSnapshot } from 'firebase/firestore';
 import React, { useState, useEffect } from 'react';
 import { View, Text, Image, TouchableOpacity, StyleSheet, Alert } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import { Camera } from 'expo-camera';
-import { FontAwesome5 } from '@expo/vector-icons';
-
-
+import Icon from 'react-native-vector-icons/FontAwesome';
+import Fontisto from 'react-native-vector-icons/Fontisto';
 
 const cleanName = (firstName) => {
   // This will remove any quotation marks from the start and end of the string
   return firstName.replace(/^"(.+)"$/, '$1');
 };
 
-
 const ProfileScreen = ({ navigation }) => {
-  const isActive = true;
   const [username, setUsername] = useState('Loading...'); // Initial state set to 'Loading...'
   const [avatar, setAvatar] = useState(null);
+  const [gender, setGender] = useState('');
 
   useEffect(() => {
     (async () => {
@@ -38,8 +35,10 @@ const ProfileScreen = ({ navigation }) => {
       const unsubscribe = onSnapshot(userRef, (doc) => {
         if (doc.exists()) {
           console.log("Document data:", doc.data());
-          const userData = doc.data(); 
+          const userData = doc.data();
           setUsername(cleanName(userData.firstName));
+          setGender(userData.gender);
+
         } else {
           console.log('No user data available');
           setUsername('No name available');
@@ -47,7 +46,6 @@ const ProfileScreen = ({ navigation }) => {
       }, (error) => {
         console.error("Error fetching document:", error);
       });
-      
 
       return () => unsubscribe();
     } else {
@@ -69,23 +67,31 @@ const ProfileScreen = ({ navigation }) => {
     }
   };
 
+  const renderDefaultAvatar = () => {
+    if (gender === 'male') {
+      return <Fontisto name="male" size={100} color="#000" />;
+    } else if (gender === 'female') {
+      return <Fontisto name="female" size={100} color="#000" />;
+    } else {
+      return <Fontisto name="person" size={100} color="#000" />;
+    }
+  };
+
   return (
     <View style={styles.container}>
       <TouchableOpacity onPress={handleImagePicker} style={styles.imageSection}>
-        <Image
-          source={avatar ? { uri: avatar } : require('./assets/pro.jpg')}
-          style={styles.avatar}
-        />
-        {/* Ensure username is within a <Text> component */}
+        {avatar ? (
+          <Image source={{ uri: avatar }} style={styles.avatar} />
+        ) : (
+          renderDefaultAvatar()
+        )}
         <Text style={styles.usernameText}>{username}</Text>
       </TouchableOpacity>
-  
+
       <View style={styles.menu}>
-        {/* Each text inside TouchableOpacity should be inside a <Text> tag */}
         <TouchableOpacity
           style={styles.menuItem}
           onPress={() => navigation.navigate('EditProfile')}>
-          
           <Text style={styles.menuText}>تعديل الملف الشخصي</Text>
         </TouchableOpacity>
         <TouchableOpacity style={styles.menuItem}>
@@ -101,36 +107,18 @@ const ProfileScreen = ({ navigation }) => {
           <Text style={styles.menuText}>من نحن</Text>
         </TouchableOpacity>
         <TouchableOpacity style={styles.menuItem}
-        onPress={() => navigation.navigate('Welcome')}>
+          onPress={() => navigation.navigate('Welcome')}>
           <Text style={styles.menuText}>تسجيل الخروج</Text>
-        </TouchableOpacity>
-      </View>
-  
-      <View style={styles.navigationBar}>
-        {/* Icons do not need <Text>, but ensuring any label would be inside <Text> */}
-        <TouchableOpacity onPress={() => navigation.navigate('ProfileScreen')}>
-          <FontAwesome5 name="user" size={isActive ? 26 : 24} color={isActive ? "#ffffff" : "#F9E4D4"} />
-        </TouchableOpacity>
-        <TouchableOpacity>
-          <FontAwesome5 name="map" size={24} color="#F9E4D4" />
-        </TouchableOpacity>
-        <TouchableOpacity onPress={() => navigation.navigate('UploadAndCapture')}>
-          <FontAwesome5 name="camera" size={24} color="#F9E4D4" />
-        </TouchableOpacity>
-        <TouchableOpacity onPress={() => navigation.navigate('Community')}>
-          <FontAwesome5 name="comments" size={24} color="#F9E4D4" />
-        </TouchableOpacity>
-        <TouchableOpacity>
-          <FontAwesome5 name="home" size={24} color="#F9E4D4" />
         </TouchableOpacity>
       </View>
     </View>
   );
-};  
+};
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#FAF6D0',
+    backgroundColor: '#EDE0C8',
   },
   imageSection: {
     alignItems: 'center',
@@ -182,3 +170,5 @@ const styles = StyleSheet.create({
 });
 
 export default ProfileScreen;
+
+

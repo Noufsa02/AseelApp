@@ -98,7 +98,7 @@ const SignInScreen = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#FAF6D0',
+    backgroundColor: '#EDE0C8',
   },
   header: {
     alignItems: 'center',
@@ -112,14 +112,14 @@ const styles = StyleSheet.create({
   headerText: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: '#649BA2',
+    color: '#000',
     marginBottom: 30,
   },
   content: {
     flexGrow: 1,
-    backgroundColor: '#8F181C',
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
+    backgroundColor: '#9DBABB',
+    borderTopLeftRadius: 100,
+    borderTopRightRadius: 0,
     alignItems: 'center',
     paddingTop: 20,
     paddingHorizontal: 20,
@@ -147,11 +147,11 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   button: {
-    backgroundColor: '#649BA2',
-    paddingVertical: 8, // Reduced padding to make the button thinner
+    backgroundColor: '#5D1B20',
+    paddingVertical: 7, // Reduced padding to make the button thinner
     paddingHorizontal: 20, // You can adjust horizontal padding if you want to change the width as well
     borderRadius: 40,
-    width: '60%', // Keep the width as is if you don't want to change it
+    width: '50%', // Keep the width as is if you don't want to change it
     alignItems: 'center',
     justifyContent: 'center',
     marginVertical: 10, // Adjust the space around the button if needed
@@ -160,13 +160,13 @@ const styles = StyleSheet.create({
   buttonText: {
     fontSize: 20,
     fontWeight: 'bold',
-    color: '#FAF6D0',
+    color: '#CCC',
   },
   linkButton: {
     marginVertical: 15,
   },
   signUpText: {
-    color: '#FAF6D0',
+    color: '#000',
     textDecorationLine: 'underline',
   },
 });

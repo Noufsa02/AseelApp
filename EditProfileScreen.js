@@ -1,24 +1,21 @@
 // EditProfileScreen.js
 import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, Image, TouchableOpacity, StyleSheet, Alert } from 'react-native';
-import { MaterialIcons } from '@expo/vector-icons';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, Image } from 'react-native';
+import { MaterialIcons, FontAwesome } from '@expo/vector-icons'; // Importing necessary icons
+import { LinearGradient } from 'expo-linear-gradient'; // Import LinearGradient from expo-linear-gradient
 import { FIREBASE_AUTH, FIREBASE_DB } from './FirebaseConfig';
-import { doc, onSnapshot } from 'firebase/firestore';
-
-
+import { doc, onSnapshot, updateDoc } from 'firebase/firestore';
+import { reauthenticateWithCredential, EmailAuthProvider, updateEmail } from 'firebase/auth';
 
 const cleanName = (firstName) => {
   // This will remove any quotation marks from the start and end of the string
   return firstName.replace(/^"(.+)"$/, '$1');
 };
 
-
-
 const EditProfileScreen = ({ navigation }) => {
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('123admin');
-
+  const [password, setPassword] = useState('');
 
   useEffect(() => {
     const currentUser = FIREBASE_AUTH.currentUser;
@@ -30,6 +27,7 @@ const EditProfileScreen = ({ navigation }) => {
         if (doc.exists()) {
           const userData = doc.data();
           setUsername(cleanName(userData.firstName)); // Set the username state to the name from Firestore
+          setEmail(userData.email); // Set the email state to the email from Firestore
         } else {
           console.log('No user data available');
           setUsername('No name available'); // Set username to 'No name available' if not found
@@ -42,115 +40,171 @@ const EditProfileScreen = ({ navigation }) => {
     }
   }, []);
 
-
-  const handleSave = () => {
+  const handleSave = async () => {
     if (!username.trim() || !email.trim() || !password.trim()) {
       Alert.alert('Error', 'Please fill out all fields');
       return;
     }
-    // Save logic here
-    navigation.goBack();
-  };
 
-  const handleDeleteAccount = () => {
-    // Delete account logic here
-    Alert.alert('Confirm', 'Are you sure you want to delete your account?', [
-      { text: 'Yes', onPress: () => navigation.goBack() },
-      { text: 'No' },
-    ]);
+    try {
+      const currentUser = FIREBASE_AUTH.currentUser;
+      if (currentUser) {
+        const credential = EmailAuthProvider.credential(currentUser.email, password);
+        await reauthenticateWithCredential(currentUser, credential);
+
+        if (currentUser.email !== email) {
+          await updateEmail(currentUser, email);
+        }
+
+        const userRef = doc(FIREBASE_DB, 'users', currentUser.uid);
+        await updateDoc(userRef, {
+          firstName: username,
+          email: email,
+        });
+
+        Alert.alert('Success', 'Profile updated successfully');
+        navigation.goBack();
+      }
+    } catch (error) {
+      console.error('Error updating profile: ', error);
+      Alert.alert('Error', 'An error occurred while updating the profile');
+    }
   };
 
   return (
-    <View style={styles.container}>
-      <Image source={require('./assets/logo.png')} style={styles.logo} />
-      <View style={styles.inputContainer}>
-        <MaterialIcons name="person" size={20} color="#6b6b6b" />
-        <TextInput
-          style={styles.input}
-          value={username}
-          onChangeText={setUsername}
-          placeholder="Username"
-        />
+    <LinearGradient colors={['#EDE0C8', '#fffafa']} style={styles.container}>
+      <View style={styles.header}>
+        <TouchableOpacity onPress={() => navigation.goBack()}>
+          <Text style={styles.cancelText}>الغاء</Text>
+        </TouchableOpacity>
+        <Text style={styles.headerTitle}>تعديل الملف الشخصي</Text>
+        <TouchableOpacity onPress={handleSave}>
+          <Text style={styles.saveText}>حفظ</Text>
+        </TouchableOpacity>
       </View>
-      <View style={styles.inputContainer}>
-        <MaterialIcons name="email" size={20} color="#6b6b6b" />
-        <TextInput
-          style={styles.input}
-          value={email}
-          onChangeText={setEmail}
-          placeholder="Email"
-        />
+      <View style={styles.profileImageContainer}>
+        <FontAwesome name="user-circle" size={100} color="#424530" />
       </View>
-      <View style={styles.inputContainer}>
-        <MaterialIcons name="lock" size={20} color="#6b6b6b" />
-        <TextInput
-          style={styles.input}
-          value={password}
-          onChangeText={setPassword}
-          placeholder="Password"
-          secureTextEntry={true}
-        />
+      <View style={styles.form}>
+        <View style={styles.inputContainer}>
+          <MaterialIcons name="person" size={20} color="#6b6b6b" />
+          <TextInput
+            style={styles.input}
+            value={username}
+            onChangeText={setUsername}
+            placeholder="الأسم الأول"
+            placeholderTextColor="#6b6b6b"
+          />
+        </View>
+        <View style={styles.inputContainer}>
+          <MaterialIcons name="email" size={20} color="#6b6b6b" />
+          <TextInput
+            style={styles.input}
+            value={email}
+            onChangeText={setEmail}
+            placeholder="الإيميل"
+            placeholderTextColor="#6b6b6b"
+          />
+        </View>
+        <TouchableOpacity style={styles.inputContainer} onPress={() => navigation.navigate('ForgotPassword')}>
+          <MaterialIcons name="lock-outline" size={20} color="#6b6b6b" />
+          <Text style={styles.changePasswordText}>تغير كلمة المرور</Text>
+          <MaterialIcons name="arrow-forward" size={20} color="#000" style={{ marginLeft: 'auto' }} />
+        </TouchableOpacity>
       </View>
-      <TouchableOpacity style={styles.saveButton} onPress={handleSave}>
-        <Text style={styles.buttonText}>Save</Text>
-      </TouchableOpacity>
-      <TouchableOpacity style={styles.deleteButton} onPress={handleDeleteAccount}>
-        <Text style={styles.buttonText}>Delete Account</Text>
-      </TouchableOpacity>
-    </View>
+      <View style={styles.footer}>
+        <Image source={require('./assets/logo - Copy.png')} style={styles.logo} />
+      </View>
+    </LinearGradient>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#FAF6D0',
-    alignItems: 'center',
-    justifyContent: 'center',
   },
-  logo: {
-    width: 350,
-    height: 350,
-    resizeMode: 'contain',
-    marginBottom: 0,
+  header: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 20,
+    paddingTop: 40,
+    paddingBottom: 20,
+  },
+  cancelText: {
+    color: '#424530', // White for better visibility
+    fontSize: 16,
+    
+  },
+  headerTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#424530', // White for better visibility
+  },
+  saveText: {
+    color: '#424530', // White for better visibility
+    fontSize: 16,
+  },
+  profileImageContainer: {
+    alignItems: 'center',
+    marginVertical: 20,
+    marginBottom:30,
+    marginTop:60,
+  },
+  form: {
+    paddingHorizontal: 20,
   },
   inputContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: 'white',
-    borderColor: 'gray',
-    borderWidth: 1,
-    padding: 10,
-    marginTop: 10,
-    width: '90%',
+    backgroundColor: 'rgba(255, 255, 255, 0)', // Transparent white
+    borderColor: '#A58E74', // Natural
+    borderBottomWidth: 3,
+    borderRadius: 10,
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    marginTop: 15,
+    width: '100%',
   },
   input: {
     marginLeft: 10,
     flex: 1,
     height: 40,
-    color: 'black',
-  },
-  saveButton: {
-    backgroundColor: 'green',
-    paddingVertical: 12,
-    paddingHorizontal: 20,
-    borderRadius: 5,
-    marginTop: 15,
-    width: '90%',
-  },
-  deleteButton: {
-    backgroundColor: 'red',
-    paddingVertical: 12,
-    paddingHorizontal: 20,
-    borderRadius: 5,
-    marginTop: 10,
-    width: '90%',
-  },
-  buttonText: {
-    color: 'white',
-    textAlign: 'center',
+    color: '#000', // Black
     fontSize: 16,
+  },
+  changePasswordText: {
+    marginLeft: 10,
+    flex: 1,
+    height: 40,
+    fontSize: 16,
+    color: '#000',
+    textAlignVertical: 'center',
+  },
+  footer: {
+    alignItems: 'center',
+    padding: 0,
+    marginTop:30,
+    //backgroundColor: '#424530', // Fern
+  },
+  logo: {
+    width: 320,
+    height: 320,
+    resizeMode: 'contain',
   },
 });
 
 export default EditProfileScreen;
+
+
+
+
+
+
+
+
+
+
+
+
+

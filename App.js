@@ -2,8 +2,9 @@ import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import 'react-native-gesture-handler';
-
-// Import screens
+import MapPage from './MapPage';
+import CategoryPage from './CategoryPage';
+import Reinfo from './Reinfo';
 import SplashScreen from './SplashScreen';
 import WelcomeScreen from './WelcomeScreen';
 import SignInScreen from './SignInScreen';
@@ -25,6 +26,7 @@ const App = () => {
         gestureEnabled: true,
         gestureDirection: 'horizontal', // Enable horizontal swipe gestures
       }}>
+        
         <Stack.Screen
           name="Splash"
           component={SplashScreen}
@@ -42,7 +44,12 @@ const App = () => {
         <Stack.Screen name="NavigationBar" component={NavigationBar} options={{ headerShown: false }}/>
         <Stack.Screen name="AboutUs" component={AboutUsScreen} options={{ headerShown: false }}/>
         <Stack.Screen name="EditProfile" component={EditProfileScreen} options={{ headerShown: false }}/>
+        <Stack.Screen name="CategoryPage" component={CategoryPage} options={{ headerShown: false }}/>
+        <Stack.Screen name="MapPage" component={MapPage} options={{ headerShown: false }}/>
+        <Stack.Screen name="Reinfo" component={Reinfo} options={{ headerShown: false }}/>
+
       </Stack.Navigator>
+      
     </NavigationContainer>
   );
 };
